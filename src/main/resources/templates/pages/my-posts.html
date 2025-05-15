@@ -43,7 +43,11 @@
 
                         <!-- Hành động -->
                         <div class="d-flex justify-content-between mt-3">
-                            <a th:href="@{'/posts/' + ${post.slug}}" class="btn btn-primary btn-sm">Đọc thêm &rarr;</a>
+                            <div><a th:href="@{'/posts/' + ${post.slug}}" class="btn btn-primary btn-sm">Đọc thêm
+                                    &rarr;</a>
+                                <a th:href="@{'/posts/edit/' + ${post.slug}}" class="btn btn-primary btn-sm">Chỉnh sửa
+                                </a>
+                            </div>
 
                             <form th:action="@{'/posts/delete/' + ${post.id}}" method="post"
                                 onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này?');">

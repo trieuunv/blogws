@@ -40,6 +40,7 @@
             </div>
         </div>
 
+        <!-- fragments/navbar.html -->
         <nav class="navbar navbar-expand-lg" style="background-color: #254892;">
             <div class="container" style="max-width: 1120px;">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -47,20 +48,22 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto"> <!-- Sử dụng me-auto để căn trái -->
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Trang chủ</a>
+                            <a class="nav-link text-white" th:classappend="${page == 'home'} ? 'active'" href="/">Trang
+                                chủ</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Giới thiệu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Liên hệ</a>
-                        </li>
+                        <th:block th:each="category : ${categories}">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" th:href="@{'/category/' + ${category.id}}"
+                                    th:text="${category.name}"></a>
+                            </li>
+                        </th:block>
                     </ul>
                 </div>
             </div>
         </nav>
+
     </header>
 </body>
 
