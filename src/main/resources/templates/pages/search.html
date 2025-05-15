@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main-layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả tìm kiếm - Blog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .post-thumbnail {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .post-content {
+            display: flex;
+            gap: 15px;
+        }
+
+        .post-text {
+            flex: 1;
+        }
+
+        .search-result-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            background-color: #ffffcc;
+            padding: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content" class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Header kết quả tìm kiếm -->
+                <div class="search-result-header">
+                    <h3 class="mb-2">Kết quả tìm kiếm</h3>
+                    <p>
+                        Tìm thấy <strong th:text="${posts.totalElements}">0</strong> bài viết cho từ khóa:
+                        <span class="highlight" th:text="${keyword}">từ khóa</span>
+                    </p>
+                </div>
+
+                <!-- Hiển thị khi không có kết quả -->
+                <div th:if="${posts.totalElements == 0}" class="alert alert-info">
+                    <p>Không tìm thấy bài viết nào phù hợp với từ khóa "<span th:text="${keyword}">từ khóa</span>".</p>
+                    <p>Vui lòng thử lại với từ khóa khác hoặc quay lại <a th:href="@{/}">trang chủ</a>.</p>
+                </div>
+
+                <!-- Danh sách kết quả tìm kiếm -->
+                <div th:each="post : ${posts}" class="card mb-4">
+                    <div class="card-body">
+                        <div class="post-content">
+                            <!-- Thumbnail ở bên trái -->
+                            <div class="post-thumbnail-container">
+                                <img th:if="${post.thumbnailUrl != null}" th:src="${post.thumbnailUrl}"
+                                    class="post-thumbnail" alt="Thumbnail">
+                                <!-- Hình mặc định nếu không có thumbnail -->
+                                <img th:unless="${post.thumbnailUrl != null}" th:src="@{/images/default-thumbnail.jpg}"
+                                    class="post-thumbnail" alt="Default Thumbnail">
+                            </div>
+
+                            <!-- Nội dung bài viết bên phải -->
+                            <div class="post-text">
+                                <h5 class="card-title" th:text="${post.title}">Tiêu đề bài viết</h5>
+                                <p class="card-text">
+                                    <!-- Hiển thị nội dung phần đầu tiên của bài viết (rút gọn) -->
+                                    <span th:if="${not #lists.isEmpty(post.sections)}"
+                                        th:utext="${#strings.abbreviate(post.sections[0].content, 300)}">Nội dung xem
+                                        trước</span>
+                                </p>
+                                <a th:href="@{'/posts/' + ${post.slug}}" class="btn btn-primary fs-9">Đọc thêm
+                                    &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Đăng vào <span th:text="${#temporals.format(post.createdAt, 'MMMM dd, yyyy')}">Ngày đăng</span>
+                        bởi
+                        <a href="#" th:text="${post.author.username}">Tác giả</a> trong
+                        <span th:if="${post.category == null}">Không có chuyên mục</span>
+                        <a href="#" th:if="${post.category != null}" th:text="${post.category.name}"
+                            th:href="@{'/category/' + ${post.category.id}}">
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Phân trang với giữ keyword -->
+                <nav th:if="${totalPages > 0}">
+                    <ul class="pagination justify-content-center mb-4">
+                        <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                            <a class="page-link"
+                                th:href="@{'/search?keyword=' + ${keyword} + '&page=' + ${currentPage - 1}}">&larr;
+                                Trước</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${currentPage == i ? 'active' : ''}">
+                            <a class="page-link" th:href="@{'/search?keyword=' + ${keyword} + '&page=' + ${i}}"
+                                th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                            <a class="page-link"
+                                th:href="@{'/search?keyword=' + ${keyword} + '&page=' + ${currentPage + 1}}">Sau
+                                &rarr;</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Cột tiện ích bên phải -->
+            <div class="col-md-4">
+
+                <!-- Tìm kiếm - với từ khóa hiện tại -->
+                <div class="card my-4">
+                    <h5 class="card-header">Tìm kiếm</h5>
+                    <div class="card-body">
+                        <form th:action="@{/search}" method="get">
+                            <div class="input-group">
+                                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm..."
+                                    th:value="${keyword}">
+                                <span class="input-group-append">
+                                    <button class="btn btn-secondary" type="submit">Tìm</button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Chuyên mục -->
+                <div class="card my-4">
+                    <h5 class="card-header">Chuyên mục</h5>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="list-unstyled mb-0">
+                                    <li th:each="category : ${categories}">
+                                        <a th:href="@{'/category/' + ${category.id}}" th:text="${category.name}">Tên
+                                            chuyên mục</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bài viết gần đây -->
+                <div class="card my-4">
+                    <h5 class="card-header">Bài viết gần đây</h5>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li th:each="recent : ${recentPosts}" class="mb-2">
+                                <a th:href="@{'/posts/' + ${recent.slug}}" th:text="${recent.title}">Bài viết</a>
+                                <small class="text-muted d-block"
+                                    th:text="${#temporals.format(recent.createdAt, 'MMM dd, yyyy')}">Ngày</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

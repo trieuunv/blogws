@@ -1,0 +1,32 @@
+footer {
+    margin-top: 35px;
+    margin-bottom: 35px;
+    border-top: solid 1px #a2a9b1;
+}
+
+.footer-container {
+    padding: 0 14px;
+    padding-top: 20px;
+    max-width: 1050px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-list {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-item {
+    list-style: none;
+}
+
+.footer-item a {
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.copyright {
+    font-size: 14px;
+}
